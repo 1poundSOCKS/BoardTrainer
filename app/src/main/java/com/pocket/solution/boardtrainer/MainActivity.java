@@ -7,6 +7,7 @@ import java.io.*;
 import android.graphics.drawable.*;
 import android.widget.*;
 import android.view.*;
+import java.lang.*;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,8 +16,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ImageView switcherView = (ImageView) this.findViewById(R.id.img);
-
+        final ImageView switcherView = this.findViewById(R.id.img);
+/*
         switcherView.setOnTouchListener(new View.OnTouchListener() {
 
             float mx = 0 , my = 0;
@@ -34,7 +35,13 @@ public class MainActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_MOVE:
                         curX = event.getX();
                         curY = event.getY();
-                        switcherView.scrollBy((int) (mx - curX), (int) (my - curY));
+                        float scrollByX = (mx - curX);
+                        float scrollByY = (my - curY);
+                        float scrollX = switcherView.getScrollX();
+                        float scrollY = switcherView.getScrollY();
+                        float newScrollX = scrollX + scrollByX;
+                        float newScrollY = scrollY + scrollByY;
+                        switcherView.scrollTo((int) newScrollX, (int) newScrollY);
                         mx = curX;
                         my = curY;
                         break;
@@ -47,6 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
                 return true;
             }
-        });
+        });*/
     }
 }
