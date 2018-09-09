@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final ImageView switcherView = this.findViewById(R.id.img);
-/*
+
         switcherView.setOnTouchListener(new View.OnTouchListener() {
 
             float mx = 0 , my = 0;
@@ -54,6 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
                 return true;
             }
-        });*/
+        });
     }
 }
