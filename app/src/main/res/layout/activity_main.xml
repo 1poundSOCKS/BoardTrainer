@@ -6,13 +6,30 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/img"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:scaleX="2"
-        android:src="@drawable/board"
-        android:scaleY="2"
+        android:layout_marginRight="2dp"
+        android:layout_marginLeft="2dp"
+        android:orientation="horizontal" >
+    <Button
+        android:id="@+id/mark_hold"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
         />
+
+    <TextView
+        android:id="@+id/debug"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        app:layout_constraintLeft_toRightOf="@+id/mark_hold" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/board"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toBottomOf="@+id/mark_hold" />
 
 </android.support.constraint.ConstraintLayout>
