@@ -25,17 +25,17 @@ public class ButtonClickListener implements View.OnClickListener {
             case 0:
                 this.button.setBackgroundColor(Color.WHITE);
                 this.button.setText("Off");
-                boardTouchListener.EnableScroll();
+                //boardTouchListener.EnableScroll();
                 break;
             case 1:
                 this.button.setBackgroundColor(Color.GREEN);
                 this.button.setText("Left hand");
-                boardTouchListener.EnableSetLeftHand();
+                //boardTouchListener.EnableSetLeftHand();
                 break;
             case 2:
                 this.button.setBackgroundColor(Color.BLUE);
                 this.button.setText("Right hand");
-                boardTouchListener.EnableSetRightHand();
+                //boardTouchListener.EnableSetRightHand();
                 break;
         }
     }
