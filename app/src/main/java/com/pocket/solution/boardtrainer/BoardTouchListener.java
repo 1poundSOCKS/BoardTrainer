@@ -3,6 +3,7 @@ package com.pocket.solution.boardtrainer;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,13 +14,15 @@ import android.graphics.Matrix;
 public class BoardTouchListener implements View.OnTouchListener {
 
     final ImageView boardView;
+    final DisplayMetrics metrics;
     final Bitmap board;
     float mx = 0 , my = 0;
 
     boolean allowScroll = false;
 
-    public BoardTouchListener(ImageView boardView) {
+    public BoardTouchListener(ImageView boardView, DisplayMetrics metrics) {
         this.boardView = boardView;
+        this.metrics = metrics;
         board = ((BitmapDrawable)this.boardView.getDrawable()).getBitmap();
     }
 
@@ -47,19 +50,14 @@ public class BoardTouchListener implements View.OnTouchListener {
                 Paint paint = new Paint();
                 paint.setAntiAlias(true);
                 paint.setColor(Color.BLUE);
-                //float[] matrix = new float[9];
-                //boardView.getImageMatrix().getValues(matrix);
                 float[] out = new float[2];
                 float[] in = { curX, curY };
+                Matrix matrix = boardView.getImageMatrix();
                 Matrix inverse = new Matrix();
-                boardView.getImageMatrix().invert(inverse);
-                inverse.postTranslate(boardView.getScrollX(), boardView.getScrollY());
-                //inverse.mapPoints(in);
+                matrix.invert(inverse);
                 inverse.mapPoints(out, in);
                 Canvas canvas = new Canvas(board);
-                //float xPos = curX / matrix[Matrix.MSCALE_X];
-                //float yPos = (curY - matrix[Matrix.MTRANS_Y]) / matrix[Matrix.MSCALE_Y];
-                canvas.drawCircle(out[0], out[1], 25, paint);
+                canvas.drawCircle(out[0] / metrics.density, out[1] / metrics.density, 50, paint);
                 boardView.invalidate();
                 break;
         }
