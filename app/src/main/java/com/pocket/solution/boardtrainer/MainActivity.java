@@ -11,6 +11,8 @@ import android.util.DisplayMetrics;
 
 public class MainActivity extends AppCompatActivity {
 
+    private BoardTouchListener boardTouchListener = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,14 +32,6 @@ public class MainActivity extends AppCompatActivity {
         Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
         Bitmap mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
-        // Get height or width of screen at runtime
-        //int screenWidth = DeviceDimensionsHelper.getDisplayWidth(this);
-        // Resize a Bitmap maintaining aspect ratio based on screen width
-        //BitmapScaler.scaleToFitWidth(bitmap, screenWidth);
-
-        Canvas canvas = new Canvas(mutableBitmap);
-        //canvas.drawCircle(60, 50, 25, paint);
-
         ImageView imageView = (ImageView)findViewById(R.id.board);
         imageView.setAdjustViewBounds(true);
         imageView.setImageBitmap(mutableBitmap);
@@ -45,14 +39,20 @@ public class MainActivity extends AppCompatActivity {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        // implement board view scrolling
+        // board touch control
         final ImageView boardView = this.findViewById(R.id.board);
-        BoardTouchListener boardTouchListener = new BoardTouchListener(boardView, metrics);
+        boardTouchListener = new BoardTouchListener(boardView, metrics);
         imageView.setOnTouchListener(boardTouchListener);
 
         // implement hold marking button
         //final Button button = this.findViewById(R.id.mark_hold);
         //OnClickListener buttonListener = new ButtonClickListener(button, boardTouchListener);
         //button.setOnClickListener(buttonListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if( boardTouchListener != null )
+            boardTouchListener.onBackPressed();
     }
 }
