@@ -1,8 +1,5 @@
 package com.pocket.solution.boardtrainer;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,21 +10,19 @@ import android.graphics.Matrix;
 
 public class BoardTouchListener implements View.OnTouchListener {
 
-    final ImageView boardView;
-    final DisplayMetrics metrics;
-    final Bitmap board;
-    float mx = 0 , my = 0;
-    int origX = 0, origY = 0;
-    enum State { Initial, Zoom }
-    State state = State.Initial;
+    final private MainActivity activity;
+    private float mx = 0 , my = 0;
+    private int origX = 0, origY = 0;
+    private enum State { Initial, Zoom }
+    private State state = State.Initial;
 
-    public BoardTouchListener(ImageView boardView, DisplayMetrics metrics) {
-        this.boardView = boardView;
-        this.metrics = metrics;
-        board = ((BitmapDrawable)this.boardView.getDrawable()).getBitmap();
+    public BoardTouchListener(MainActivity activity) {
+        this.activity = activity;
     }
 
     public boolean onTouch(View arg0, MotionEvent event) {
+
+        ImageView view = this.activity.GetImageView();
 
         float curX, curY;
 
@@ -44,29 +39,26 @@ public class BoardTouchListener implements View.OnTouchListener {
             case MotionEvent.ACTION_UP:
                 curX = event.getX();
                 curY = event.getY();
-                float[] in = {curX + boardView.getScrollX(), curY + boardView.getScrollY()};
+                float[] in = {curX + view.getScrollX(), curY + view.getScrollY()};
 
                 if (state == State.Initial) {
-                    origX = boardView.getScrollX();
-                    origY = boardView.getScrollY();
-                    int boardWidth = boardView.getMeasuredWidth();
-                    int boardHeight = boardView.getMeasuredHeight();
-                    int scrollX = (int)(boardView.getScrollX() + curX - boardWidth / 2);
-                    int scrollY = (int)(boardView.getScrollY() + curY - boardHeight / 2);
-                    boardView.scrollTo(scrollX, scrollY);
-                    boardView.setScaleX(3);
-                    boardView.setScaleY(3);
-                    boardView.invalidate();
+                    origX = view.getScrollX();
+                    origY = view.getScrollY();
+                    int boardWidth = view.getMeasuredWidth();
+                    int boardHeight = view.getMeasuredHeight();
+                    int scrollX = (int)(view.getScrollX() + curX - boardWidth / 2);
+                    int scrollY = (int)(view.getScrollY() + curY - boardHeight / 2);
+                    view.scrollTo(scrollX, scrollY);
+                    view.setScaleX(3);
+                    view.setScaleY(3);
+                    view.invalidate();
                     state = State.Zoom;
                 }
                 else {
-                    Paint paint = new Paint();
-                    paint.setAntiAlias(true);
-                    paint.setColor(Color.RED);
-                    Canvas canvas = new Canvas(board);
-                    float[] out = convertViewCoordinatesToBitmap(in);
-                    canvas.drawCircle(out[0], out[1], 20, paint);
-                    boardView.invalidate();
+                    float[] out = this.activity.convertViewCoordinatesToBitmap(in);
+                    Bitmap board = ((BitmapDrawable)view.getDrawable()).getBitmap();
+                    this.activity.getBoardData().markHold(board, out[0], out[1]);
+                    view.invalidate();
                 }
 
                 break;
@@ -75,32 +67,12 @@ public class BoardTouchListener implements View.OnTouchListener {
         return true;
     }
 
-    public float[] convertViewCoordinatesToBitmap(float[] in) {
-        float[] out = new float[in.length];
-        Matrix matrix = boardView.getImageMatrix();
-        Matrix inverse = new Matrix();
-        matrix.invert(inverse);
-        inverse.mapPoints(out, in);
-        for( int i = 0; i < out.length; i++ )
-            out[i] /= metrics.density;
-        return out;
-    }
-
-    public float[] convertBitmapCoordinatesToView(float[] in) {
-        float[] out = new float[in.length];
-        for( int i = 0; i < out.length; i++ )
-          out[i] = in[i] * metrics.density;
-
-        Matrix matrix = boardView.getImageMatrix();
-        matrix.mapPoints(out, out);
-        return out;
-    }
-
     public void onBackPressed() {
-        boardView.setScaleX(1);
-        boardView.setScaleY(1);
-        boardView.scrollTo(origX, origY);
-        boardView.invalidate();
+        ImageView view = this.activity.GetImageView();
+        view.setScaleX(1);
+        view.setScaleY(1);
+        view.scrollTo(origX, origY);
+        view.invalidate();
         state = State.Initial;
     }
 }
