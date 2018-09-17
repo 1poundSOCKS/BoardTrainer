@@ -11,7 +11,7 @@ import java.util.*;
 
 public class BoardData implements java.io.Serializable {
 
-    private List<Pair<Float, Float>> markedHolds = new ArrayList<Pair<Float, Float>>();
+    private List<Pair<Float, Float>> markedHolds = new ArrayList<>();
 
     static public Bitmap LoadBitmap(Resources res, int id) {
         BitmapFactory.Options myOptions = new BitmapFactory.Options();
@@ -32,7 +32,7 @@ public class BoardData implements java.io.Serializable {
     }
 
     public void markHold(Bitmap board, float cx, float cy) {
-        markedHolds.add(new Pair<Float, Float>(cx, cy));
+        markedHolds.add(new Pair<>(cx, cy));
         drawMark(board, cx, cy);
     }
 

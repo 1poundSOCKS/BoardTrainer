@@ -1,6 +1,5 @@
 package com.pocket.solution.boardtrainer;
 
-
 import java.lang.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +11,9 @@ import android.util.DisplayMetrics;
 public class MainActivity extends AppCompatActivity {
 
     private BoardTouchListener boardTouchListener;
-    private BoardData boardData;
+    private BoardData boardData = new BoardData();
+    private enum State { Initial, Zoom }
+    private State state = State.Initial;
 
     public BoardData getBoardData() {
         return boardData;
@@ -27,15 +28,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.boardData = new BoardData();
         Bitmap board = BoardData.LoadBitmap(getResources(), R.drawable.board);
 
         ImageView imageView = GetImageView();
         imageView.setAdjustViewBounds(true);
         imageView.setImageBitmap(board);
 
+        switch( state ) {
+            case Initial:
+                imageView.setScaleX(1);
+                imageView.setScaleY(1);
+                break;
+            case Zoom:
+                imageView.setScaleX(3);
+                imageView.setScaleY(3);
+                break;
+        }
+
         // board touch control
-        final ImageView boardView = this.findViewById(R.id.board);
         boardTouchListener = new BoardTouchListener(this);
         imageView.setOnTouchListener(boardTouchListener);
 
@@ -47,14 +57,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if( boardTouchListener != null )
-            boardTouchListener.onBackPressed();
+        switch( state ) {
+            case Initial:
+                super.onBackPressed();
+                break;
+            case Zoom:
+                ImageView view = GetImageView();
+                view.setScaleX(1);
+                view.setScaleY(1);
+                view.scrollTo(0, 0);
+                view.invalidate();
+                state = State.Initial;
+                break;
+        }
+    }
+
+    @Override
+    protected void onPause () {
+        super.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("BoardData", this.boardData);
+        outState.putSerializable("State", this.state);
     }
 
     @Override
@@ -65,6 +92,38 @@ public class MainActivity extends AppCompatActivity {
             ImageView imageView = findViewById(R.id.board);
             Bitmap board = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
             this.boardData.MarkAllHolds(board);
+            this.state = (State)savedInstanceState.getSerializable("State");
+        }
+    }
+
+    public void OnClick(float curX, float curY) {
+        ImageView view = GetImageView();
+        float[] in = {curX + view.getScrollX(), curY + view.getScrollY()};
+
+        if (state == State.Initial) {
+            int boardWidth = view.getMeasuredWidth();
+            int boardHeight = view.getMeasuredHeight();
+            int scrollX = (int)(view.getScrollX() + curX - boardWidth / 2);
+            int scrollY = (int)(view.getScrollY() + curY - boardHeight / 2);
+            view.scrollTo(scrollX, scrollY);
+            view.setScaleX(3);
+            view.setScaleY(3);
+            view.invalidate();
+            state = State.Zoom;
+        }
+        else {
+            float[] out = convertViewCoordinatesToBitmap(in);
+            Bitmap board = ((BitmapDrawable)view.getDrawable()).getBitmap();
+            getBoardData().markHold(board, out[0], out[1]);
+            view.invalidate();
+        }
+    }
+
+    public void OnScroll(float cx, float cy) {
+        if( state == State.Zoom ) {
+            ImageView view = GetImageView();
+            view.setScrollX(view.getScrollX() - (int)cx);
+            view.setScrollY(view.getScrollY() - (int)cy);
         }
     }
 
